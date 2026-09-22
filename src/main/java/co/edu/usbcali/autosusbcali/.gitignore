@@ -1,0 +1,27 @@
+# IntelliJ IDEA
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# Maven
+target/
+
+# Logs
+*.log
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Variables de entorno y credenciales
+.env
+.env.*
+application-local.properties
+application-local.yml
+application.properties
+
+# Archivos temporales
+*.tmp
+*.temp
+
