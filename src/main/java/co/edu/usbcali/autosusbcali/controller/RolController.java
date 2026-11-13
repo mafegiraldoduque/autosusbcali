@@ -73,10 +73,4 @@ public class RolController {
         rolService.eliminarRol(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
-
-    @DeleteMapping("/eliminar-fisico/{id}")
-    public ResponseEntity<Void> eliminarRolFisicamente(@PathVariable Long id) throws Exception {
-        rolService.eliminarRolFisicamente(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-    }
 }
