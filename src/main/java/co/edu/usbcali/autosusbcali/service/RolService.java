@@ -5,6 +5,8 @@ import co.edu.usbcali.autosusbcali.dto.request.CrearModificarRolRequest;
 import co.edu.usbcali.autosusbcali.dto.response.ObtenerRolResponse;
 import co.edu.usbcali.autosusbcali.mapper.RolMapper;
 import co.edu.usbcali.autosusbcali.repository.RolRepository;
+import jakarta.persistence.EntityManager;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +17,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class RolService implements IRolService{
     private final RolRepository rolRepository;
+    private final EntityManager entityManager;
 
     @Override
     public List<ObtenerRolResponse> obtenerTodos() {
@@ -137,5 +140,29 @@ public class RolService implements IRolService{
         rol.setActivo(false);
         // Guardar la actualización del estado en la base de datos
         rolRepository.save(rol);
+    }
+
+    @Override
+    @Transactional
+    public void eliminarRolFisicamente(Long id) throws Exception {
+        if (id == null) {
+            throw new Exception("El id no puede ser nulo.");
+        }
+
+        Rol rol = rolRepository.findById(id)
+                .orElseThrow(() -> new Exception("No existe un rol con el id " + id));
+
+        // Eliminar primero las relaciones para evitar conflictos con las claves foráneas.
+        // También se retiran las asignaciones del rol a usuarios.
+        entityManager.createQuery("DELETE FROM UsuarioRol ur WHERE ur.rol.id = :rolId")
+                .setParameter("rolId", id)
+                .executeUpdate();
+
+        entityManager.createQuery("DELETE FROM RolPermiso rp WHERE rp.rol.id = :rolId")
+                .setParameter("rolId", id)
+                .executeUpdate();
+
+        // Eliminar definitivamente el registro de la tabla roles.
+        rolRepository.delete(rol);
     }
 }
