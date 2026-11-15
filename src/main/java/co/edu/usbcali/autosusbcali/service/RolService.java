@@ -6,7 +6,10 @@ import co.edu.usbcali.autosusbcali.dto.response.ObtenerRolResponse;
 import co.edu.usbcali.autosusbcali.mapper.RolMapper;
 import co.edu.usbcali.autosusbcali.repository.RolRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -138,4 +141,28 @@ public class RolService implements IRolService{
         // Guardar la actualización del estado en la base de datos
         rolRepository.save(rol);
     }
+
+
+    @Override
+    @Transactional
+    public void eliminarRolFisicamente(Long id) {
+        // 1. Verificar que se haya recibido un identificador
+        if (id == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "El id no puede ser nulo."
+            );
+        }
+
+        // 2. Buscar el rol en la base de datos
+        Rol rol = rolRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND,
+                        "No existe un rol con el id " + id
+                ));
+
+        // 3. Eliminar físicamente el registro
+        rolRepository.delete(rol);
+    }
+
 }
